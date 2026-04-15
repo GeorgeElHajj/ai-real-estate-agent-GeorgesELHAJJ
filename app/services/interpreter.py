@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+import time
 
 from dotenv import load_dotenv
 from google import genai
@@ -13,6 +14,7 @@ from app.utils.prompt_logger import log_prompt_result
 load_dotenv()
 
 PROMPT_DIR = Path("prompts")
+DEFAULT_STAGE2_MODEL = os.getenv("GEMINI_STAGE2_MODEL", "gemini-1.5-pro")
 
 
 def load_prompt(version: str = "final") -> str:
@@ -20,15 +22,21 @@ def load_prompt(version: str = "final") -> str:
     return prompt_path.read_text(encoding="utf-8")
 
 
-def call_gemini_text(prompt: str, model_name: str = "gemini-2.5-flash"):
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+def call_gemini_text(prompt: str, model_name: str = DEFAULT_STAGE2_MODEL, retries: int = 3) -> str:
+    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-    response = client.models.generate_content(
-        model=model_name,
-        contents=prompt,
-    )
-
-    return response.text.strip()
+    for attempt in range(retries):
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+            )
+            return response.text.strip()
+        except Exception as e:
+            if attempt < retries - 1:
+                time.sleep(2)
+            else:
+                raise e
 
 
 def build_interpretation_prompt(
