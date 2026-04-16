@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from google import genai
 from pydantic import ValidationError
+from datetime import datetime
 
 from app.schemas.extraction import (
     ExtractionResult,
@@ -35,20 +36,30 @@ def load_prompt(version: str) -> str:
     return prompt_path.read_text(encoding="utf-8")
 
 
-def normalize_house_age(result: ExtractionResult, reference_year: int = 2010) -> ExtractionResult:
+def normalize_house_age(result: ExtractionResult, reference_year: int | None = None) -> ExtractionResult:
+    if reference_year is None:
+        reference_year = datetime.now().year
+
     if result.features.HouseAge is None:
         if result.year_built_raw is not None:
-            result.features.HouseAge = reference_year - result.year_built_raw
-            result.assumptions.append(
-                f"HouseAge derived from build year {result.year_built_raw} using reference year {reference_year}."
-            )
+            derived_age = reference_year - result.year_built_raw
+
+            if derived_age >= 0:
+                result.features.HouseAge = derived_age
+                result.assumptions.append(
+                    f"HouseAge derived from build year {result.year_built_raw} using reference year {reference_year}."
+                )
+
         elif result.age_descriptor:
             descriptor = result.age_descriptor.strip().lower()
-            if descriptor in AGE_DESCRIPTOR_MAP:
-                result.features.HouseAge = AGE_DESCRIPTOR_MAP[descriptor]
-                result.assumptions.append(
-                    f"HouseAge approximated from age descriptor '{descriptor}'."
-                )
+
+            for key, age_value in AGE_DESCRIPTOR_MAP.items():
+                if key in descriptor:
+                    result.features.HouseAge = age_value
+                    result.assumptions.append(
+                        f"HouseAge approximated from age descriptor '{descriptor}'."
+                    )
+                    break
 
     extracted_fields = []
     missing_fields = []
@@ -65,8 +76,7 @@ def normalize_house_age(result: ExtractionResult, reference_year: int = 2010) ->
 
     return result
 
-
-def call_gemini(prompt: str, model_name: str = "gemini-2.5-pro") -> str:
+def call_gemini(prompt: str, model_name: str = os.getenv("GEMINI_MODEL")) -> str:
     client = genai.Client()
 
     response = client.models.generate_content(

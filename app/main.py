@@ -1,17 +1,24 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from app.schemas.api import QueryRequest, IncompleteResponse, CompleteResponse
+from app.schemas.api import (
+    QueryRequest,
+    IncompleteResponse,
+    CompleteResponse,
+    PredictFromFeaturesRequest,
+)
 from app.schemas.extraction import ExtractedFeatures
+from app.schemas.image import ImageGenerationRequest, ImageGenerationResponse
 from app.services.feature_extractor import extract_features
 from app.services.predictor import PredictorService
 from app.services.interpreter import interpret_prediction
+from app.services.image_generator import generate_house_image
 
 
 app = FastAPI(
     title="AI Real Estate Agent API",
     version="1.0.0",
-    description="Stage 1 extraction + ML prediction + Stage 2 interpretation"
+    description="LLM extraction + ML prediction + LLM interpretation + image generation"
 )
 
 predictor_service = PredictorService()
@@ -42,7 +49,6 @@ def predict_price(request: QueryRequest):
 
     features_obj = ExtractedFeatures(**features_dict)
 
-    # CRITICAL: do not silently fill missing values
     if missing_fields:
         response = IncompleteResponse(
             status="incomplete",
@@ -55,7 +61,6 @@ def predict_price(request: QueryRequest):
         )
         return response.model_dump()
 
-    # Only predict when all required fields are available
     prediction = predictor_service.predict(features_obj)
 
     stage2_response = interpret_prediction(
@@ -83,3 +88,44 @@ def predict_price(request: QueryRequest):
     )
 
     return response.model_dump()
+
+
+@app.post("/predict_from_features", response_model=None)
+def predict_from_features(request: PredictFromFeaturesRequest):
+    features_obj = request.features
+    query = request.query
+
+    prediction = predictor_service.predict(features_obj)
+
+    stage2_response = interpret_prediction(
+        user_query=query,
+        features=features_obj,
+        missing_fields=[],
+        prediction=prediction,
+        model_name=predictor_service.get_model_name(),
+        assumptions=[],
+        version="final",
+    )
+
+    response = CompleteResponse(
+        status="complete",
+        message="Prediction completed successfully.",
+        extracted_features=features_obj,
+        extracted_fields=[
+            k for k, v in features_obj.model_dump().items() if v is not None
+        ],
+        missing_fields=[],
+        assumptions=stage2_response.assumptions,
+        prediction=stage2_response.prediction,
+        interpretation=stage2_response.interpretation,
+        model_name=stage2_response.model_name,
+        extraction_prompt_version="final",
+        interpretation_prompt_version=stage2_response.interpretation_prompt_version,
+    )
+
+    return response.model_dump()
+
+
+@app.post("/generate-image", response_model=ImageGenerationResponse)
+def generate_image(request: ImageGenerationRequest):
+    return generate_house_image(request.query, request.features)

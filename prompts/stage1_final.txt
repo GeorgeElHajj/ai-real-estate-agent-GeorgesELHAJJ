@@ -41,7 +41,6 @@ Feature definitions:
 
 * FullBath:
   Number of FULL bathrooms only.
-  If user says "2 bathrooms" and type is unclear → leave null.
 
 * LotArea:
   Lot size in square feet (numeric only if explicitly stated).
