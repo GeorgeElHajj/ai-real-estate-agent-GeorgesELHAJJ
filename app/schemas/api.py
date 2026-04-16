@@ -35,3 +35,7 @@ class CompleteResponse(BaseModel):
     model_name: Optional[str]
     extraction_prompt_version: str
     interpretation_prompt_version: str
+    
+class PredictFromFeaturesRequest(BaseModel):
+    query: str
+    features: ExtractedFeatures

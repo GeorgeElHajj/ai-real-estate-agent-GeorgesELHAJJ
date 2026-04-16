@@ -14,7 +14,6 @@ from app.utils.prompt_logger import log_prompt_result
 load_dotenv()
 
 PROMPT_DIR = Path("prompts")
-DEFAULT_STAGE2_MODEL = os.getenv("GEMINI_STAGE2_MODEL", "gemini-1.5-pro")
 
 
 def load_prompt(version: str = "final") -> str:
@@ -22,8 +21,8 @@ def load_prompt(version: str = "final") -> str:
     return prompt_path.read_text(encoding="utf-8")
 
 
-def call_gemini_text(prompt: str, model_name: str = DEFAULT_STAGE2_MODEL, retries: int = 3) -> str:
-    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+def call_gemini_text(prompt: str, model_name: str = os.getenv("GEMINI_MODEL"), retries: int = 3) -> str:
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
     for attempt in range(retries):
         try:
