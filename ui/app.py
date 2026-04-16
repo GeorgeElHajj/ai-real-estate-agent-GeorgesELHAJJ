@@ -2,9 +2,11 @@ import base64
 import streamlit as st
 import requests
 
-API_URL = "http://127.0.0.1:8000/predict"
-COMPLETE_API_URL = "http://127.0.0.1:8000/predict_from_features"
-IMAGE_API_URL = "http://127.0.0.1:8000/generate-image"
+import os
+
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000/predict")
+COMPLETE_API_URL = os.getenv("COMPLETE_API_URL", "http://127.0.0.1:8000/predict_from_features")
+IMAGE_API_URL = os.getenv("IMAGE_API_URL", "http://127.0.0.1:8000/generate-image")
 
 st.set_page_config(
     page_title="Estima · AI Property Valuator",

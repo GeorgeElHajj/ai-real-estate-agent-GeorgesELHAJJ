@@ -55,7 +55,7 @@ def call_image_provider(image_prompt: str) -> str:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     result = client.images.generate(
-        model="gpt-image-1",
+        model=os.getenv("GPT_IMAGE_MODEL"),
         prompt=image_prompt,
         size="1024x1024",
     )
