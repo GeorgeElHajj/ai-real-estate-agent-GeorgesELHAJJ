@@ -1,0 +1,9 @@
+scikit-learn==1.8.0
+joblib==1.4.2
+fastapi==0.111.0
+uvicorn==0.30.1
+python-dotenv==1.0.1
+google-genai==0.4.0
+openai>=1.56.0
+httpx==0.27.2a
+pydantic>=2.10,<2.13
