@@ -39,7 +39,7 @@ def generate_visual_prompt_with_gemini(
     prompt: str,
     model_name: Optional[str] = None,
 ) -> str:
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
     model = model_name or os.getenv("GEMINI_MODEL")
 

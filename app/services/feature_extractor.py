@@ -82,10 +82,6 @@ def call_gemini(prompt: str, model_name: str = os.getenv("GEMINI_MODEL")) -> str
     response = client.models.generate_content(
         model=model_name,
         contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_json_schema": ExtractionResult.model_json_schema(),
-        },
     )
 
     return response.text
