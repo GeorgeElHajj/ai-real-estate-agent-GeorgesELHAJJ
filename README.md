@@ -140,8 +140,8 @@ LLM explains the prediction:
 ### 1. Clone repository
 
 ```bash
-git clone <your-repo>
-cd your-repo
+git clone https://github.com/GeorgeElHajj/ai-real-estate-agent-GeorgesELHAJJ.git
+cd ai-real-estate-agent-GeorgesELHAJJ
 ```
 
 ---
