@@ -39,7 +39,10 @@ def predict_price(request: QueryRequest):
             content={"error": "Query must not be empty."}
         )
 
+    print("QUERY RECEIVED:", user_query)
+
     stage1_result = extract_features(user_query, version="final")
+    print("STAGE1 RESULT:", stage1_result)
 
     features_dict = stage1_result["features"]
     extracted_fields = stage1_result["extracted_fields"]

@@ -22,7 +22,7 @@ def load_prompt(version: str = "final") -> str:
 
 
 def call_gemini_text(prompt: str, model_name: str = os.getenv("GEMINI_MODEL"), retries: int = 3) -> str:
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
     for attempt in range(retries):
         try:
