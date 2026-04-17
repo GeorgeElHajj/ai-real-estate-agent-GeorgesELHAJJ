@@ -7,6 +7,5 @@ venv/
 
 data/raw/
 data/processed/
-ml/artifacts/
 
 .DS_Store

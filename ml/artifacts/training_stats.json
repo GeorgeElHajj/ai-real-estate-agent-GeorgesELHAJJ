@@ -1,0 +1,15 @@
+{
+  "target": "SalePrice",
+  "train_count": 1756,
+  "val_count": 585,
+  "median_price": 161625.0,
+  "mean_price": 180208.63781321186,
+  "min_price": 12789.0,
+  "max_price": 745000.0,
+  "q1_price": 129900.0,
+  "q3_price": 212500.0,
+  "best_model": "gradient_boosting",
+  "validation_rmse": 22810.824395553824,
+  "validation_mae": 15982.026085850848,
+  "validation_r2": 0.92210512673719
+}
